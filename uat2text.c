@@ -24,18 +24,16 @@
 void handle_frame(frame_type_t type, uint8_t *frame, int len, void *extra)
 {
     if (type == UAT_DOWNLINK) {
+        FILE *fp;
+        fp = fopen("/tmp/address_output.txt", "a+");
         struct uat_adsb_mdb mdb;
-        uat_decode_adsb_mdb(frame, &mdb);
-        uat_display_adsb_mdb(&mdb, stdout);
-    } else {
-        struct uat_uplink_mdb mdb;
-        uat_decode_uplink_mdb(frame, &mdb);
-        uat_display_uplink_mdb(&mdb, stdout);
+        mdb.address = (frame[1] << 16) | (frame[2] << 8) | frame[3];
+        char str[255];
+        sprintf(str, "%06X\n", mdb.address);
+        fputs(str, fp);
     }
+}
 
-    fprintf(stdout, "\n");
-    fflush(stdout);
-}        
 
 int main(int argc, char **argv)
 {
